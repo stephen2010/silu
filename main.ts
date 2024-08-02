@@ -1,8 +1,5 @@
 import { Command, configure, EnumType, handler, Logger } from "./lib/mod.ts";
 
-const logger = new Logger();
-const logModeType = new EnumType(["disable", "console", "file", "both"]);
-const logLevelType = new EnumType(["info", "warn", "error"]);
 const authType = new EnumType(["none", "basic"]);
 
 const cmd = new Command()
@@ -10,8 +7,6 @@ const cmd = new Command()
   .version("0.1.3")
   .description("A simple http/https tunnel && proxy server of Deno")
   .usage("[option...]")
-  .type("logMode", logModeType)
-  .type("logLevel", logLevelType)
   .type("authType", authType)
   .option(
     "--timeout, -t <milliseconds:number>",
@@ -82,24 +77,14 @@ async function main() {
   }
 
   const { http, https, timeout, log, auth, bind } = command.options;
-  const listener = await configure(http, https, logger, log, bind);
+  const listener = await configure(http, https, bind);
 
   for await (const conn of listener) {
-    handler(conn, auth, timeout, logger).catch((e) => {
-      logger.warn(e.toString());
-    });
+    handler(conn, auth, timeout, logger).catch((e) => {});
   }
 }
 
-main().catch((e) => {
-  logger.enable();
-  logger.enableConsole();
-  logger.enableFile();
-  logger.error(e);
-//  setTimeout(() => {
-//    Deno.exit();
-//  }, 1);
-});
+main().catch((e) => {});
 
 function readAsConfig(file: string) {
   const configRaw = Deno.readTextFileSync(file);
