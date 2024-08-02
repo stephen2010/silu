@@ -97,7 +97,7 @@ main().catch((e) => {
   logger.enableFile();
   logger.error(e);
   setTimeout(() => {
-    Deno.exit(1);
+    Deno.exit();
   }, 1);
 });
 
