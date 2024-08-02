@@ -7,13 +7,10 @@ import {
   timeoutFetch,
 } from "./mod.ts";
 
-import type { Logger } from "./mod.ts";
-
 export async function handler(
   incomeConn: Deno.Conn,
   auth: AuthType,
   timeout: number,
-  logger: Logger,
 ) {
   const income = incomeConn.remoteAddr as Deno.NetAddr;
   const reader = incomeConn.readable.getReader();
@@ -34,9 +31,6 @@ export async function handler(
         await new Auth(request, incomeConn, auth).auth();
         await tunnel();
       } catch (e) {
-        logger.warn(
-          `Tunnel: ${income.hostname}:${income.port} == ${target.hostname}:${target.port} failed , ${e}`,
-        );
       } finally {
         safeClose(incomeConn);
       }
@@ -47,9 +41,6 @@ export async function handler(
         await new Auth(request, incomeConn, auth).auth();
         await proxy();
       } catch (e) {
-        logger.warn(
-          `Proxy : ${income.hostname}:${income.port} -> ${target.hostname}:${target.port} failed , ${e}`,
-        );
       } finally {
         safeClose(incomeConn);
       }
@@ -62,10 +53,6 @@ export async function handler(
 
     await incomeConn.write(
       encoder.encode("HTTP/1.1 200 Connection established\r\n\r\n"),
-    );
-
-    logger.info(
-      `Tunnel: ${income.hostname}:${income.port} == ${target.hostname}:${target.port}`,
     );
 
     await Promise.all([
@@ -89,10 +76,6 @@ export async function handler(
       }),
       timeout,
       ctrl,
-    );
-
-    logger.info(
-      `Proxy : ${income.hostname}:${income.port} -> ${target.hostname}:${target.port}`,
     );
 
     const { status, statusText } = res;
