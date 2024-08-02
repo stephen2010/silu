@@ -78,7 +78,7 @@ async function main() {
 
   if (!(command.options?.http || command.options?.https)) {
     cmd.showHelp();
-    Deno.exit();
+//    Deno.exit();
   }
 
   const { http, https, timeout, log, auth, bind } = command.options;
@@ -96,9 +96,9 @@ main().catch((e) => {
   logger.enableConsole();
   logger.enableFile();
   logger.error(e);
-  setTimeout(() => {
-    Deno.exit();
-  }, 1);
+//  setTimeout(() => {
+//    Deno.exit();
+//  }, 1);
 });
 
 function readAsConfig(file: string) {
